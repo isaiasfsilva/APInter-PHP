@@ -84,12 +84,17 @@ $boleto->setDataVencimento(date_add(new DateTime() , new DateInterval("P10D"))->
 var_dump(json_decode(json_encode($boleto)));
 
 try {
-    $banco->createBoleto($boleto);
+    $banco->createBoleto($boleto);    
+    // Necessario para v3 da api de cobranca. Os dados como seuNumero, etc nao vem por padrao na criacao.
+    $banco->loadBoleto($boleto->getCodigoSolicitacao(), $boleto);
+
     echo "\nBoleto Criado\n";
     echo "\n seuNumero: ".$boleto->getSeuNumero();
     echo "\n nossoNumero: ".$boleto->getNossoNumero();
     echo "\n codigoBarras: ".$boleto->getCodigoBarras();
     echo "\n linhaDigitavel: ".$boleto->getLinhaDigitavel();
+    
+    echo "\n pixCopiaECola: ".$boleto->getPixCopiaECola();
 } catch ( BancoInterException $e ) {
     echo "\n\n".$e->getMessage();
     echo "\n\nCabeçalhos: \n";
@@ -102,7 +107,7 @@ try {
 
 try {
     echo "\Download do PDF\n";
-    $pdf = $banco->getPdfBoleto($boleto->getNossoNumero());
+    $pdf = $banco->getPdfBoleto($boleto->getCodigoSolicitacao());
     echo "\n\nSalvo PDF em ".$pdf."\n";
 } catch ( BancoInterException $e ) {
     echo "\n\n".$e->getMessage();
@@ -116,7 +121,7 @@ try {
 
 try {
     echo "\nConsultando boleto\n";
-    $boleto2 = $banco->getBoleto($boleto->getNossoNumero());
+    $boleto2 = $banco->getBoleto($boleto->getCodigoSolicitacao());
     var_dump($boleto2);
 } catch ( BancoInterException $e ) {
     echo "\n\n".$e->getMessage();
@@ -142,7 +147,7 @@ try {
 
 try {
     echo "\nConsultando boleto antigo\n";
-    $boleto2 = $banco->getBoleto("00571817313"); // alterar para um número de boleto seu
+    $boleto2 = $banco->getBoleto("00571817313abcdefgh"); // alterar para um codigo de solicitacao de boleto seu
     var_dump($boleto2);
 } catch ( BancoInterException $e ) {
     echo "\n\n".$e->getMessage();

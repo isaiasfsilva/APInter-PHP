@@ -42,7 +42,10 @@ final class BancoInterTest extends TestCase
         $boleto->setDataVencimento("2020-08-10");
         
         try {
-            $banco->createBoleto($boleto);
+            $banco->createBoleto($boleto);            
+            // Necessario para v3 da api de cobranca. Os dados como seuNumero, etc nao vem por padrao na criacao.
+            $banco->loadBoleto($boleto->getCodigoSolicitacao(), $boleto);
+            
             $this->assertNotNull($boleto->getNossoNumero());
             $this->assertNotNull($boleto->getCodigoBarras());
             $this->assertNotNull($boleto->getLinhaDigitavel());

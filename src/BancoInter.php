@@ -232,6 +232,7 @@ class BancoInter
 
         if ($this->oAuthToken) {
             $http_params[] = 'Authorization: Bearer ' . $this->oAuthToken;
+            $http_params[] = 'x-conta-corrente: ' . $this->accountNumber;
         }
 
         if ($postJson) {
@@ -297,6 +298,7 @@ class BancoInter
         $this->checkOAuthToken();
 
         $http_params[] = 'Authorization: Bearer ' . $this->oAuthToken;
+        $http_params[] = 'x-conta-corrente: ' . $this->accountNumber;
 
         $retry = 5;
         while ($retry > 0) {
@@ -347,46 +349,70 @@ class BancoInter
         // garante que o boleto tem um controller
         $boleto->setController($this);
 
-        $reply = $this->controllerPost("/cobranca/v2/boletos", $boleto);
+        $reply = $this->controllerPost("/cobranca/v3/cobrancas", $boleto);
 
         $replyData = json_decode($reply->body);
 
-        $boleto->setNossoNumero($replyData->nossoNumero);
-        $boleto->setCodigoBarras($replyData->codigoBarras);
-        $boleto->setLinhaDigitavel($replyData->linhaDigitavel);
+        // Mudanca entre v2 e v3: A criacao do boleto somente retorna o codigoSolicitacao.
+        // Os campos NossoNumero, CodigoBarras, linhaDigitavel nao sao mais retornados. Deve-se
+        // fazer uma loadBoleto() request para recuperar tais campos posteriormente
+        $boleto->setCodigoSolicitacao($replyData->codigoSolicitacao);
+
+
 
         return $boleto;
     }
 
     /**
      *
-     * @param  string $nossoNumero
+     * @param  string $codigoSolicitacao
      * @return \stdClass
      */
-    public function getBoleto(string $nossoNumero): \stdClass
+    public function getBoleto(string $codigoSolicitacao): \stdClass
     {
-        $reply = $this->controllerGet("/cobranca/v2/boletos/" . $nossoNumero);
+        $reply = $this->controllerGet("/cobranca/v3/cobrancas/" . $codigoSolicitacao);
 
         $replyData = json_decode($reply->body);
 
         return $replyData;
     }
 
+
+    /**
+     * Carrega dados do boleto depois de emitido.
+     * 
+     * @param  string $codigoSolicitacao
+     * @param  Boleto $boleto Boleto a ser populado
+     */
+    public function loadBoleto(string $codigoSolicitacao, Boleto $boleto)
+    {
+        $reply = $this->getBoleto($codigoSolicitacao);
+
+        //informacoes sobre o boleto
+        $boleto->setNossoNumero($reply->boleto->nossoNumero);
+        $boleto->setCodigoBarras($reply->boleto->codigoBarras);
+        $boleto->setLinhaDigitavel($reply->boleto->linhaDigitavel);
+
+        //informacoes sobre pix
+        $boleto->setPixCopiaECola($reply->pix->pixCopiaECola);
+    }
+
+
     /**
      * Faz download do PDF do boleto
      *
-     * @param  string $nossoNumero
+     * @param  string $codigoSolicitacao
      * @param  string $savePath    Pasta a salvar o arquivo (default para a pasta de upload ou tmp)
      * @throws BancoInterException
      * @return string Caminho completo do arquivo baixado
      */
-    public function getPdfBoleto(string $nossoNumero, string $savePath = null): string
+    public function getPdfBoleto(string $codigoSolicitacao, string $savePath = null): string
     {
         if ($savePath == null) {
             $savePath = ini_get('upload_tmp_dir') ? ini_get('upload_tmp_dir') : sys_get_temp_dir();
         }
 
-        $reply = $this->getPdfBoletoBase64($nossoNumero);
+        $reply = $this->getPdfBoletoBase64($codigoSolicitacao);
 
         $filename = tempnam($savePath, "boleto-inter-") . ".pdf";
 
@@ -401,13 +427,13 @@ class BancoInter
      * Faz download do PDF do boleto e retorna apenas o conteúdo binário
      * codificado em string base64
      *
-     * @param  string $nossoNumero
+     * @param  string $codigoSolicitacao
      * @throws BancoInterException
      * @return string Conteúdo do PDF codificado em string base64
      */
-    public function getPdfBoletoBase64(string $nossoNumero): string
+    public function getPdfBoletoBase64(string $codigoSolicitacao): string
     {
-        $reply = $this->controllerGet("/cobranca/v2/boletos/$nossoNumero/pdf");
+        $reply = $this->controllerGet("/cobranca/v3/cobrancas/$codigoSolicitacao/pdf");
 
         if (!$reply->body) {
             throw new BancoInterException('Erro ao receber o PDF', 0, $reply);
@@ -416,12 +442,19 @@ class BancoInter
         return json_decode($reply->body)->pdf;
     }
 
-    public function baixaBoleto(string $nossoNumero, string $motivo = "ACERTOS")
+    /**
+     * Baixa um boleto (Cancela)
+     * 
+     * @param string $codigoSolicitacao 
+     * @param string $motivo Motivo do cancelamento (default: ACERTOS)
+     * @return mixed
+     */
+    public function baixaBoleto(string $codigoSolicitacao, string $motivo = "ACERTOS")
     {
         $data = new StdSerializable();
         $data->motivoCancelamento = $motivo;
 
-        $reply = $this->controllerPost("/cobranca/v2/boletos/" . $nossoNumero . "/cancelar", $data);
+        $reply = $this->controllerPost("/cobranca/v3/cobrancas/" . $codigoSolicitacao . "/cancelar", $data);
 
         $replyData = json_decode($reply->body);
 
@@ -452,7 +485,7 @@ class BancoInter
         $inverterOrdem = false
     ): \stdClass {
 
-        $url = "/cobranca/v2/boletos";
+        $url = "/cobranca/v3/cobrancas";
         $url .= "?dataInicial=" . $dataInicial;
         $url .= "&dataFinal=" . $dataFinal;
         if ($filtro) {
@@ -676,6 +709,7 @@ class BancoInter
 
         if ($this->oAuthToken) {
             $http_params[] = 'Authorization: Bearer ' . $this->oAuthToken;
+            $http_params[] = 'x-conta-corrente: ' . $this->accountNumber;
         }
 
         $retry = 5;
