@@ -19,10 +19,13 @@ class Boleto implements \JsonSerializable
     private $desconto3 = null;
     private $multa = null;
     private $mora = null;
+    private $beneficiarioFinal = null;
+    private $pixCopiaECola = null;
 
     private $nossoNumero = null;
     private $codigoBarras = null;
     private $linhaDigitavel = null;
+    private $codigoSolicitacao = null;
 
     private $controller = null;
 
@@ -339,6 +342,55 @@ class Boleto implements \JsonSerializable
     {
         $this->linhaDigitavel = $linhaDigitavel;
     }
+
+    /**
+     * @return mixed $codigoSolicitacao
+     */
+    public function getCodigoSolicitacao()
+    {
+        return $this->codigoSolicitacao;
+    }
+
+    /**
+     * @param mixed $codigo
+     */    
+    public function setCodigoSolicitacao($codigo)
+    {
+        $this->codigoSolicitacao = $codigo;
+    }
+
+    /**
+     * @return mixed $beneficiarioFinal
+     */
+    public function getBeneficiarioFinal(): ?Pagador
+    {
+        return $this->beneficiarioFinal;
+    }
+
+    /**
+     * @param mixed $beneficiarioFinal
+     */
+    public function setBeneficiarioFinal(Pagador $beneficiarioFinal)
+    {
+        $this->beneficiarioFinal = $beneficiarioFinal;
+    }
+
+    /**
+     * @return mixed $pixCopiaECola
+     */
+    public function getPixCopiaECola()
+    {
+        return $this->pixCopiaECola;
+    }
+
+    /**
+     * @param mixed $pix
+     */
+    public function setPixCopiaECola($pix)
+    {
+        $this->pixCopiaECola = $pix;
+    }
+
 
     /**
      *
