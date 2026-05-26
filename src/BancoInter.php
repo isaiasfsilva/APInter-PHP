@@ -381,12 +381,11 @@ class BancoInter
     /**
      * Carrega dados do boleto depois de emitido.
      * 
-     * @param  string $codigoSolicitacao
      * @param  Boleto $boleto Boleto a ser populado
      */
-    public function loadBoleto(string $codigoSolicitacao, Boleto $boleto)
+    public function loadBoleto(Boleto $boleto)
     {
-        $reply = $this->getBoleto($codigoSolicitacao);
+        $reply = $this->getBoleto($boleto->getCodigoSolicitacao());
 
         //informacoes sobre o boleto
         $boleto->setNossoNumero($reply->boleto->nossoNumero);

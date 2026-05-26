@@ -44,8 +44,8 @@ final class BancoInterTest extends TestCase
         try {
             $banco->createBoleto($boleto);            
             // Necessario para v3 da api de cobranca. Os dados como seuNumero, etc nao vem por padrao na criacao.
-            $banco->loadBoleto($boleto->getCodigoSolicitacao(), $boleto);
-            
+            $banco->loadBoleto($boleto);
+
             $this->assertNotNull($boleto->getNossoNumero());
             $this->assertNotNull($boleto->getCodigoBarras());
             $this->assertNotNull($boleto->getLinhaDigitavel());

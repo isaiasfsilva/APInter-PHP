@@ -86,14 +86,14 @@ var_dump(json_decode(json_encode($boleto)));
 try {
     $banco->createBoleto($boleto);    
     // Necessario para v3 da api de cobranca. Os dados como seuNumero, etc nao vem por padrao na criacao.
-    $banco->loadBoleto($boleto->getCodigoSolicitacao(), $boleto);
+    $banco->loadBoleto($boleto);
 
     echo "\nBoleto Criado\n";
     echo "\n seuNumero: ".$boleto->getSeuNumero();
     echo "\n nossoNumero: ".$boleto->getNossoNumero();
     echo "\n codigoBarras: ".$boleto->getCodigoBarras();
     echo "\n linhaDigitavel: ".$boleto->getLinhaDigitavel();
-    
+
     echo "\n pixCopiaECola: ".$boleto->getPixCopiaECola();
 } catch ( BancoInterException $e ) {
     echo "\n\n".$e->getMessage();
