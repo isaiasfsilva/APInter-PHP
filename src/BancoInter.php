@@ -437,6 +437,7 @@ class BancoInter
      *                             0)
      * @param  number $linhas      Linhas de resultado (default = 20)
      * @param  string $filtro      Filtro de resultado (default = "TODOS")
+     * @param  string $filtroData  Filtro de resultado (default = "VENCIMENTO")
      * @param  string $ordem       Ordem do resultado (default = "NOSSONUMERO")
      * @return \stdClass
      */
@@ -446,6 +447,7 @@ class BancoInter
         $pagina = 0,
         $linhas = 20,
         $filtro = null,
+        $filtroData = null, 
         $ordem = null,
         $inverterOrdem = false
     ): \stdClass {
@@ -455,6 +457,9 @@ class BancoInter
         $url .= "&dataFinal=" . $dataFinal;
         if ($filtro) {
             $url .= "&situacao=" . $filtro;
+        }
+        if ($filtroData) {
+            $url .= "&filtrarDataPor=" . $filtroData;
         }
         if ($ordem) {
             if (endsWith($ordem, '_DSC')) {
