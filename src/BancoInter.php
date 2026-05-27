@@ -643,7 +643,7 @@ class BancoInter
 
     public function createWebhook($webhookUrl): bool
     {
-        $url = "/cobranca/v2/boletos/webhook";
+        $url = "/cobranca/v3/cobrancas/webhook";
 
         $params = new \ctodobom\APInterPHP\StdSerializable();
 
@@ -675,7 +675,7 @@ class BancoInter
 
     public function getWebhook(): string
     {
-        $url = "/cobranca/v2/boletos/webhook";
+        $url = "/cobranca/v3/cobrancas/webhook";
 
         $reply = $this->controllerGet($url);
 
@@ -688,7 +688,7 @@ class BancoInter
     public function deleteWebhook(): string
     {
 
-        $url = "/cobranca/v2/boletos/webhook";
+        $url = "/cobranca/v3/cobrancas/webhook";
 
         $reply = $this->controllerDelete($url);
 
