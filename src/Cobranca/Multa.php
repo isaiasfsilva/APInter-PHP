@@ -5,10 +5,8 @@ namespace ctodobom\APInterPHP\Cobranca;
 class Multa implements \JsonSerializable
 {
     private $codigoMulta = "NAOTEMMULTA";
-    private $data = "";
     private $taxa = 0.0;
-    private $valor = 0.0;
-
+    
     public const NAO_TEM_MULTA = 'NAOTEMMULTA';
     public const VALOR_FIXO = 'VALORFIXO';
     public const PERCENTUAL = 'PERCENTUAL';
@@ -20,13 +18,7 @@ class Multa implements \JsonSerializable
         return $this->codigoMulta;
     }
 
-    /**
-     * @return number
-     */
-    public function getValor()
-    {
-        return $this->valor;
-    }
+    
 
     /**
      * @return number
@@ -36,13 +28,7 @@ class Multa implements \JsonSerializable
         return $this->taxa;
     }
 
-    /**
-     * @return string
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
+     
 
     /**
      * @param string $codigos
@@ -52,14 +38,7 @@ class Multa implements \JsonSerializable
         $this->codigoMulta = $codigoMulta;
     }
 
-    /**
-     * @param number $valor
-     */
-    public function setValor($valor)
-    {
-        $this->valor = $valor;
-    }
-
+     
     /**
      * @param number $taxa
      */
@@ -68,13 +47,7 @@ class Multa implements \JsonSerializable
         $this->taxa = $taxa;
     }
 
-    /**
-     * @param string $data
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-    }
+    
 
     public function jsonSerialize(): array
     {
