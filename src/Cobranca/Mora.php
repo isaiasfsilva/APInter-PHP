@@ -4,7 +4,7 @@ namespace ctodobom\APInterPHP\Cobranca;
 
 class Mora implements \JsonSerializable
 {
-    private $codigoMora = "ISENTO";
+    private $codigo = "ISENTO";
     private $taxa = 0.0;
 
     public const ISENTO = 'ISENTO';
@@ -16,7 +16,7 @@ class Mora implements \JsonSerializable
      */
     public function getCodigoMora()
     {
-        return $this->codigoMora;
+        return $this->codigo;
     }
 
     /**
@@ -31,9 +31,9 @@ class Mora implements \JsonSerializable
     /**
      * @param string $codigoMora
      */
-    public function setCodigoMora($codigoMora)
+    public function setCodigoMora($codigo)
     {
-        $this->codigoMora = $codigoMora;
+        $this->codigo = $codigo;
     }
 
 
